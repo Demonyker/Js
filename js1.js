@@ -23,9 +23,7 @@ var slon = (arg1, arg2) => {
        return result = true;
     } else if ( arg1n[0] === alf[i] && (arg2n[0] === alf[i+7] || arg2n[0] === alf[i-2]) && (+arg2n[1] === (+arg1n[1] + 7)) || +arg2n[1] === (+arg1n[1] - 7) ) {
        return result = true;
-    } else {
-        return result = false;
-    }
+    } 
 }
 }
 slon(pos1, pos2)
