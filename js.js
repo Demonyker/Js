@@ -6,7 +6,9 @@ function maxsum(arr) {
         for (i; i < arr.length; i++) {
             sum = sum + arr[i]
             if (sum > maxNumber) {
-             maxNumber = sum
+             return maxNumber = sum
             }
         }
 }
+maxsum(arr)
+console.log(maxNumber)
