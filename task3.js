@@ -1,5 +1,5 @@
 var strokaOne = 'abcdefgh'
-var strokaTwo = 'cdebghaf'         
+var strokaTwo = 'cdehgbaf'         
 let checkString = (string1,string2) => {
     let result
     let checkNumber = 0;

@@ -6,9 +6,9 @@ var slon = (arg1, arg2) => {
    let arg2n = arg2.split('')
    let arg1nP1 = arg1n[0].charCodeAt(0)
    let arg1nP2 = arg2n[0].charCodeAt(0)
-   if ( (arg1n[1] - arg1nP1) === (arg2n[1] - arg1nP2) ) {
+   if ( ((arg1n[1] - arg1nP1) === (arg2n[1] - arg1nP2)) || ( (+arg1n[1] + arg1nP1) === (+arg2n[1] + arg1nP2) )) {
      result = true
-   } else { 
+   } else {
      result = false
    }
    console.log(result)
