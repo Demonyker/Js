@@ -1,8 +1,7 @@
-var result
-var alf = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 var pos1 = prompt('введите первую позицию')
 var pos2 = prompt('введите вторую позицию')
 var slon = (arg1, arg2) => {
+   let result
    let arg1n = arg1.split('')
    let arg2n = arg2.split('')
    let arg1nP1 = arg1n[0].charCodeAt(0)
