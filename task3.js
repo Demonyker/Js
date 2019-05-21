@@ -6,7 +6,6 @@ let checkString = (string1,string2) => {
     arr1 = string1.split('')
     arr2 = string2.split('')
     arr1k = Object.keys(arr1)
-    arr2k = Object.keys(arr2)
     arr1Len = arr1.length
     for ( let i = 0; i < arr1.length; i++) {
         for ( let j = 0; j< arr1.length; j++) {
