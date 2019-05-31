@@ -2,61 +2,82 @@ class Director {
   constructor(name, age) {
     this.name = name;
     this.age = age;
-    this.projects = 0;
+    this.projects = [];
     this.progers = [];
+    this.newStaff = 0;
+    this.realPr = 0;
+    this.rmWorkers = 0;
   }
 
-  getProjects(projects) {
-    if (projects.length > 4) {
-      console.log('Слишком много проектов, не могу принять');
-    } else {
-      this.projects = projects;
-    }
+  getProjects(project) {
+    this.projects.push(project);
   }
 
   getProgers(Proger, id, spec) {
     this.progers.push(new Proger(id, spec));
+    this.newStaff += 1;
+  }
+
+  realisePr() {
+    this.realPr += 1;
+  }
+
+  deleteWorker() {
+    this.rmWorkers += 1;
   }
 }
 class PartOfCompany {
-  constructor(progers, projects) {
-    this.progers = progers;
-    this.projects = projects;
+  constructor() {
+    this.progers = [];
+    this.projects = [];
+  }
+
+  takeProject(i, pr) {
+    this.progers[i].curPr = pr;
+    this.progers[i].status = 'busy';
+    this.progers[i].exp += 1;
   }
 }
 class WebDev extends PartOfCompany {
-  constructor(progers, projects) {
-    super(progers, projects);
+  constructor() {
+    super();
     this.spec = 'web';
   }
 
-  takeProject(i) {
-    this.progers[i].projects += 1;
-    this.progers[i].status = 'busy';
-    this.progers[i].exp += 1;
-    this.project[i] = `На этом проекте работает программист ${this.progers[i].id}`;
+  getProgers(Proger, id, spec) {
+    this.progers.push(new Proger(id, spec));
+    this.newStaff += 1;
   }
 }
 class MobDev extends PartOfCompany {
-  constructor(progers, projects) {
-    super(progers, projects);
-    this.spec = 'mobile';
+  constructor() {
+    super();
+    this.spec = 'mob';
   }
 
-  takeProjectOnPr(i) {
-    this.progers[i].projects += 1;
-    this.progers[i].status = 'busy';
-    this.progers[i].exp += 1;
-  }
-
-  takeProjectOnPart(i) {
-    this.project[i] = `На этом проекте работает программист ${this.progers[i].id}`;
+  getProgers(Proger, id, spec) {
+    this.progers.push(new Proger(id, spec));
+    this.newStaff += 1;
   }
 }
 class Testers extends PartOfCompany {
   constructor() {
     super();
-    this.spec = 'testers';
+    this.spec = 'test';
+    this.workD = 0;
+  }
+
+  takePrOnTest(project) {
+    this.projects.push(project);
+  }
+
+  realisePr(i) {
+    this.workD = 0;
+    this.projects.splice(i, 1);
+  }
+
+  preReal(i) {
+    this.projects[i].status = 'ready';
   }
 }
 class Proger {
@@ -64,56 +85,74 @@ class Proger {
     this.id = id;
     this.spec = spec;
     this.exp = 0;
-    this.curPr = 0;
+    this.curPr = {};
     this.status = 'free';
+    this.workD = 0;
+    this.doNC = 1;
+  }
+
+  workDaysOnPr() {
+    this.workD += 1;
+    this.doNC = 1;
+  }
+
+  endWorkPr() {
+    this.workD = 0;
+    this.status = 'free';
+    this.curPr = null;
+  }
+
+  doNoth() {
+    this.doNC += 1;
+  }
+}
+class Project {
+  constructor(spec, diffic, name) {
+    this.spec = spec;
+    this.diffic = diffic;
+    this.name = name;
+    this.status = 'unready';
   }
 }
 
-
-/* let arrT = [];
-arrT.push(new Proger(1, 'mob'));
-arrT.push(new Proger(2, 'web'));
-arrT.push(new Proger(3, 'mob'));
-arrT.push(new Proger(4, 'web'));
-arrT.push(new Proger(5, 'web'));
-let diff = 3;
-let test = 0;
-  arrT.some((key, k) => {
-    if (key.spec === 'web') {
-    console.log(key.id);
-    test += 1;
-    }
-    if (test === diff) {
-      return test;
-    }
-});
-*/
+const pr1 = new Project('web', 1, 'sait1');
+const pr2 = new Project('mob', 2, 'inst');
+const pr3 = new Project('mob', 2, 'tinder');
+const pr4 = new Project('mob', 2, 'tinder');
+const pr5 = new Project('mob', 2, 'inst');
+const pr6 = new Project('mob', 2, 'inst');
+const pr7 = new Project('mob', 2, 'inst');
+const pr8 = new Project('mob', 2, 'tinder');
+const pr9 = new Project('mob', 2, 'tinder');
+const pr10 = new Project('mob', 2, 'tinder');
+const pr11 = new Project('mob', 2, 'inst');
+const pr13 = new Project('mob', 2, 'tinder');
+const pr14 = new Project('mob', 2, 'tinder');
+const pr15 = new Project('mob', 2, 'tinder');
+const pr16 = new Project('mob', 2, 'inst');
+const pr17 = new Project('mob', 2, 'tinder');
+const pr18 = new Project('mob', 2, 'tinder');
+const pr19 = new Project('mob', 2, 'tinder');
+const massOfP = [pr1, pr2, pr3, pr4, pr5, pr6, pr7, pr8, pr9, pr10, pr11, pr13, pr14, pr15, pr16, pr17, pr18, pr19];
 function workCompany(days, numofPr, massOfPr) { // ноль проектов, ноль программистов
-  let realizePr = 0;
-  let newStaff = 0;
-  let rmStaff = 0;
-  let rabotniki = [];
-  let mobRab;
   const denis = new Director('Denis', 35);
   const web = new WebDev();
   const mob = new MobDev();
-  const testers = new Testers();
-  let projects = [];
-  for (let j = 0; j < days; j += 1) {
+  const test = new Testers();
+  for (let j = 1; j < (days + 1); j += 1) {
     let diff = 0; // очень нужно для работы моб. отдела
-    let naim = 0; // количество нанятых работников
+    let naim;// счетчик нанятых работников
     if (denis.projects.length > 0) {
       denis.projects.forEach((item) => {
-        const Pr = item.split(', ');
-        const theme = Pr[0];
-        const difficulty = Pr[1];
-        if (theme === 'web') {
-          denis.getProgers(Proger, naim, theme);
+        naim = denis.newStaff + 1;
+        if (item.spec === 'web') {
+          web.getProgers(Proger, naim, item.spec);
+          denis.newStaff += 1;
           naim += 1;
-        } else if (theme === 'mob') {
-          for (let naimR = 0; naimR < difficulty; naimR += 1) {
-            denis.getProgers(Proger, naim, theme);
-            naim += 1;
+        } else if (item.spec === 'mob') {
+          for (let naimR = 0; naimR < item.diffic; naimR += 1) {
+            mob.getProgers(Proger, (naim + naimR), item.spec);
+            denis.newStaff += 1;
           }
         }
       });
@@ -122,42 +161,80 @@ function workCompany(days, numofPr, massOfPr) { // ноль проектов, н
       console.log('Слишком много проектов');
     } else {
       for (let i = 0; i < numofPr; i += 1) {
-        projects.push(massOfPr[i]);
-        denis.getProjects(projects);
+        denis.getProjects(massOfPr[i]);
       }
+      massOfPr.splice(0, numofPr);
     }
     if (denis.projects.length > 0) {
       denis.projects.forEach((item, i) => {
-        const Pr = item.split(', ');
-        const theme = Pr[0];
-        const difficulty = Pr[1];
-        if (theme === 'web' && (web.progers.length > 0)) {
+        if (item.spec === 'web' && (web.progers.length > 0)) {
           web.progers.some((key, k) => {
             if (key.status === 'free') {
-              web.takeProject(k);
+              web.takeProject(k, denis.projects[i]);
               denis.projects.splice(i, 1);
             }
-            return k;
+            return key;
           });
-        } else if (theme === 'mob' && (mob.progers.length > 0) && (mob.progers.filter(rabotnik => rabotnik.status === 'free')).length >= +difficulty) {
+        } else if (item.spec === 'mob' && (mob.progers.length > 0) && (mob.progers.filter(rabotnik => rabotnik.status === 'free')).length >= item.diffic) {
           mob.progers.some((key, k) => {
             if (key.status === 'free') {
-              mob.takeProjectOnPr(k);
-              mobRab.push(mob.progers[k].id);
+              mob.takeProject(k, denis.projects[i]);
               diff += 1;
             }
-            if (diff === +difficulty) {
-              mobRab.forEach((idRab, l) => {
-              
-              })
-              mob.takeProjectOnPart();
+            if (diff === item.diffic) {
               denis.projects.splice(i, 1);
-              return diff;
+              return k;
             }
+            return k;
           });
         }
       });
     }
+    web.progers.forEach((item) => {
+      if (item.status === 'busy' && item.curPr.diffic !== item.workD) {
+        item.workDaysOnPr();
+      } else if (item.curPr && item.curPr.diffic === item.workD) {
+        test.takePrOnTest(item.curPr);
+        item.endWorkPr();
+      } else if (item.curPr === null) {
+        item.doNoth();
+        console.log(item.id, 't3', item.doNC, j);
+      }
+    });
+    mob.progers.forEach((item) => {
+      if (item.status === 'busy' && item.workD === 0) {
+        item.workDaysOnPr();
+      } else if (item.curPr && item.workD === 1) {
+        test.takePrOnTest(item.curPr);
+        item.endWorkPr();
+      } else if (item.curPr === null) {
+        item.doNoth();
+      }
+    });
+    test.projects.some((item, i) => {
+      if (item.status !== 'ready') {
+        test.preReal(i);
+      } else if (item.status === 'ready') {
+        test.realisePr(i);
+        denis.realisePr();
+      }
+      return item;
+    });
+    web.progers.forEach((item, i) => {
+      if (item.exp > 0 && item.doNC > 3) {
+        web.progers.splice(i, 1);
+        denis.deleteWorker();
+      }
+    });
+    mob.progers.forEach((item, i) => {
+      if (item.exp > 0 && item.doNC > 3) {
+        web.progers.splice(i, 1);
+        denis.deleteWorker();
+      }
+    });
   }
+  console.log(denis.newStaff);
+  console.log(denis.realPr);
+  console.log(denis.rmWorkers);
 }
-workCompany(2);
+workCompany(7, 2, massOfP);
