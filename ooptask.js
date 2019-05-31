@@ -4,9 +4,6 @@ class Director {
     this.age = age;
     this.projects = [];
     this.progers = [];
-    this.newStaff = 0;
-    this.realPr = 0;
-    this.rmWorkers = 0;
   }
 
   getProjects(project) {
@@ -15,15 +12,6 @@ class Director {
 
   getProgers(Proger, id, spec) {
     this.progers.push(new Proger(id, spec));
-    this.newStaff += 1;
-  }
-
-  realisePr() {
-    this.realPr += 1;
-  }
-
-  deleteWorker() {
-    this.rmWorkers += 1;
   }
 }
 class PartOfCompany {
@@ -37,27 +25,21 @@ class PartOfCompany {
     this.progers[i].status = 'busy';
     this.progers[i].exp += 1;
   }
+
+  getProgers(prog) {
+    this.progers.push(prog);
+  }
 }
 class WebDev extends PartOfCompany {
   constructor() {
     super();
     this.spec = 'web';
   }
-
-  getProgers(Proger, id, spec) {
-    this.progers.push(new Proger(id, spec));
-    this.newStaff += 1;
-  }
 }
 class MobDev extends PartOfCompany {
   constructor() {
     super();
     this.spec = 'mob';
-  }
-
-  getProgers(Proger, id, spec) {
-    this.progers.push(new Proger(id, spec));
-    this.newStaff += 1;
   }
 }
 class Testers extends PartOfCompany {
@@ -114,7 +96,26 @@ class Project {
     this.status = 'unready';
   }
 }
+class Firm {
+  constructor(name) {
+    this.name = name;
+    this.newStaff = 0;
+    this.realPr = 0;
+    this.rmWorkers = 0;
+  }
 
+  realisePr() {
+    this.realPr += 1;
+  }
+
+  deleteWorker() {
+    this.rmWorkers += 1;
+  }
+
+  getWorker() {
+    this.newStaff += 1;
+  }
+}
 const pr1 = new Project('web', 1, 'sait1');
 const pr2 = new Project('mob', 2, 'inst');
 const pr3 = new Project('mob', 2, 'tinder');
@@ -133,30 +134,40 @@ const pr16 = new Project('mob', 2, 'inst');
 const pr17 = new Project('mob', 2, 'tinder');
 const pr18 = new Project('mob', 2, 'tinder');
 const pr19 = new Project('mob', 2, 'tinder');
-const massOfP = [pr1, pr2, pr3, pr4, pr5, pr6, pr7, pr8, pr9, pr10, pr11, pr13, pr14, pr15, pr16, pr17, pr18, pr19];
+const massOfP = [pr1, pr2, pr3, pr4, pr5, pr6, pr7, pr8, pr9, pr10,
+  pr11, pr13, pr14, pr15, pr16, pr17, pr18, pr19];
 function workCompany(days, numofPr, massOfPr) { // ноль проектов, ноль программистов
   const denis = new Director('Denis', 35);
   const web = new WebDev();
   const mob = new MobDev();
   const test = new Testers();
+  const lds = new Firm('Lodoss');
   for (let j = 1; j < (days + 1); j += 1) {
     let diff = 0; // очень нужно для работы моб. отдела
     let naim;// счетчик нанятых работников
     if (denis.projects.length > 0) {
       denis.projects.forEach((item) => {
-        naim = denis.newStaff + 1;
+        naim = lds.newStaff + 1;
         if (item.spec === 'web') {
-          web.getProgers(Proger, naim, item.spec);
-          denis.newStaff += 1;
+          denis.getProgers(Proger, naim, item.spec);
+          lds.getWorker();
           naim += 1;
         } else if (item.spec === 'mob') {
           for (let naimR = 0; naimR < item.diffic; naimR += 1) {
-            mob.getProgers(Proger, (naim + naimR), item.spec);
-            denis.newStaff += 1;
+            denis.getProgers(Proger, (naim + naimR), item.spec);
+            lds.getWorker();
           }
         }
       });
     }
+    denis.progers.forEach((item, i) => {
+      if (item.spec === 'web') {
+        web.getProgers(item);
+      } else if (item.spec === 'mob') {
+        mob.getProgers(item);
+      }
+      denis.progers.splice(i, 1);
+    });
     if (numofPr > 4) {
       console.log('Слишком много проектов');
     } else {
@@ -198,7 +209,6 @@ function workCompany(days, numofPr, massOfPr) { // ноль проектов, н
         item.endWorkPr();
       } else if (item.curPr === null) {
         item.doNoth();
-        console.log(item.id, 't3', item.doNC, j);
       }
     });
     mob.progers.forEach((item) => {
@@ -216,25 +226,25 @@ function workCompany(days, numofPr, massOfPr) { // ноль проектов, н
         test.preReal(i);
       } else if (item.status === 'ready') {
         test.realisePr(i);
-        denis.realisePr();
+        lds.realisePr();
       }
       return item;
     });
     web.progers.forEach((item, i) => {
       if (item.exp > 0 && item.doNC > 3) {
         web.progers.splice(i, 1);
-        denis.deleteWorker();
+        lds.deleteWorker();
       }
     });
     mob.progers.forEach((item, i) => {
       if (item.exp > 0 && item.doNC > 3) {
         web.progers.splice(i, 1);
-        denis.deleteWorker();
+        lds.deleteWorker();
       }
     });
   }
-  console.log(denis.newStaff);
-  console.log(denis.realPr);
-  console.log(denis.rmWorkers);
+  console.log(lds.newStaff);
+  console.log(lds.realPr);
+  console.log(lds.rmWorkers);
 }
 workCompany(7, 2, massOfP);
