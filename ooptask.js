@@ -8,6 +8,7 @@ class Project {
     this.status = 'ready';
   }
 }
+// создать фабрику для проектов и программистов
 class WebProject extends Project {
 }
 class MobileProject extends Project {
@@ -58,8 +59,118 @@ class Programmer {
   }
 }
 class WebProgrammer extends Programmer {
+  workDay() {
+    if (this.currentProject && this.currentProject.difficulty !== this.workDays) {
+      this.workDaysOnProject();
+    } else if (this.currentProject && this.currentProject.difficulty === this.workDays) {
+      this.endWorkOnProject();
+    } else if (!this.currentProject) {
+      this.doNothing();
+    }
+  }
 }
 class MobileProgrammer extends Programmer {
+  workDay() {
+    if (this.currentProject && this.workDays === 0) {
+      this.workDaysOnProject();
+    } else if (this.currentProject && this.workDays === 1) {
+      this.endWorkOnProject();
+    } else if (!this.currentProject) {
+      this.doNothing();
+    }
+  }
+}
+class PartOfCompany {
+  constructor() {
+    this.programmers = [];
+    this.projects = [];
+    this.dismissedWorkers = 0;
+  }
+
+  takeProject(project) {
+    this.programmers.some((programmer) => {
+      if (programmer.currentProject === null) {
+        programmer.takeProject(project);
+        return programmer;
+      }
+    });
+  }
+
+  addProgrammer(programmer) {
+    this.programmers.push(programmer);
+  }
+
+  dismissWorker() {
+    const n = this.programmers.length;
+    const workersForDiss = [];
+    for (let i = 0; i < n; i += 1) {
+      const worker = this.programmers.shift();
+      if (worker.doNothingDays > 3) {
+        workersForDiss.push(worker);
+      } else {
+        this.programmers.push(worker);
+      }
+    }
+    const numberOfForDissWorkers = workersForDiss.length;
+    let lowExperience = 0;
+    const workersForDissmiss = [];
+    if (numberOfForDissWorkers > 1) {
+      for (let i = 0; i < numberOfForDissWorkers; i += 1) {
+        const workerDiss = workersForDiss.shift();
+        if (workerDiss.experience <= lowExperience) {
+          workersForDissmiss.push(workerDiss);
+          lowExperience = workersForDiss.experience;
+          this.dismissedWorkers += 1;
+        } else {
+          workersForDiss.push(workerDiss);
+        }
+      }
+      workersForDiss.forEach((worker) => {
+        this.programmers.push(worker);
+      });
+    } else if (numberOfForDissWorkers === 1) {
+      workersForDissmiss.push(workersForDiss[0]);
+      this.dismissedWorkers += 1;
+    }
+  }
+}
+class Web extends PartOfCompany {
+  workDay() {
+    this.programmers.forEach((programmer) => {
+      programmer.workDay();
+    });
+  }
+}
+class Mobile extends PartOfCompany {
+  workDay() {
+    this.programmers.forEach((programmer) => {
+      programmer.workDay();
+    });
+  }
+}
+class Testers extends PartOfCompany {
+  constructor() {
+    super();
+    this.workDays = 0;
+    this.implementProject = 0;
+  }
+
+  takeProjectOnTest(project) {
+    this.projects.push(project);
+  }
+
+  testProject() {
+    const n = this.projects.length;
+    const projects = this.projects;
+    for (let i = 0; i < n; i += 1) {
+      const project = projects.shift();
+      if (project.status !== 'ready') {
+        project.readyForImplement();
+      } else if (project.status === 'ready') {
+        this.implementProject += 1;
+      }
+    }
+  }
 }
 class Director {
   constructor(name, age) {
@@ -70,7 +181,7 @@ class Director {
     this.newStaff = 0;
     this.numberOfProgrammers = 0;
     this.numberOfProjects = 0;
-  }
+  } // сделать через синглтон
 
   addProject() {
     const arr = this.projects;
@@ -104,89 +215,8 @@ class Director {
     }
   }
 }
-class PartOfCompany {
-  constructor() {
-    this.programmers = [];
-    this.projects = [];
-    this.dismissedWorkers = 0;
-  }
 
-  takeProject(project) {
-    this.programmers.some((programmer) => {
-      if (programmer.currentProject === null) {
-        programmer.takeProject(project);
-        return programmer;
-      }
-    });
-  }
-
-  addProgrammer(programmer) {
-    this.programmers.push(programmer);
-  }
-
-  dismissWorker() {
-    const n = this.programmers.length;
-    for (let i = 0; i < n; i += 1) {
-      const programmer = this.programmers[i];
-      if (programmer.experience > 0 && programmer.doNothingDays > 3) {
-        this.dismissedWorkers += 1;
-        this.programmers.slice(i, 1);
-        i -= 1;
-      }
-    }
-  }
-}
-class Web extends PartOfCompany {
-  workDay() {
-    this.programmers.forEach((programmer) => {
-      if (programmer.currentProject !== null && programmer.currentProject.difficulty !== programmer.workDays) {
-        programmer.workDaysOnProject();
-      } else if (programmer.currentProject && programmer.currentProject.difficulty === programmer.workDays) {
-        programmer.endWorkOnProject();
-      } else if (programmer.currentProject === null) {
-        programmer.doNothing();
-      }
-    });
-  }
-}
-class Mobile extends PartOfCompany {
-  workDay() {
-    this.programmers.forEach((programmer) => {
-      if (programmer.currentProject !== null && programmer.workDays === 0) {
-        programmer.workDaysOnProject();
-      } else if (programmer.currentProject && programmer.workDays === 1) {
-        programmer.endWorkOnProject();
-      } else if (programmer.currentProject === null) {
-        programmer.doNothing();
-      }
-    });
-  }
-}
-class Testers extends PartOfCompany {
-  constructor() {
-    super();
-    this.workDays = 0;
-    this.implementProject = 0;
-  }
-
-  takeProjectOnTest(project) {
-    this.projects.push(project);
-  }
-
-  testProject() {
-    const n = this.projects.length;
-    const projects = this.projects;
-    for (let i = 0; i < n; i += 1) {
-      const project = projects.shift();
-      if (project.status !== 'ready') {
-        project.readyForImplement();
-      } else if (project.status === 'ready') {
-        this.implementProject += 1;
-      }
-    }
-  }
-}
-class Firm {
+class Firm { // реализуется паттерн компоновщик
   constructor(name) {
     this.name = name;
     this.director = null;
@@ -208,7 +238,56 @@ class Firm {
       this.testDepartament = new Testers();
     }
   }
+
+  directorTransferProgrammers() {
+    for (let i = 0; i < (this.director.numberOfProgrammers + 1); i += 1) {
+      const programmer = this.director.programmers.shift();
+      if (programmer instanceof WebProgrammer) {
+        this.webDepartament.addProgrammer(programmer);
+      } else if (programmer instanceof MobileProgrammer) {
+        this.mobileDepartament.addProgrammer(programmer);
+      }
+    }
+  }
+
+  directorTransferProjects() {
+    for (let i = 0; i < this.director.numberOfProjects; i += 1) {
+      const project = this.director.projects[i];
+      if (project instanceof WebProject && this.webDepartament.programmers) {
+        this.webDepartament.takeProject(project);
+        this.director.transferProject();
+      } else if (project instanceof MobileProject && this.mobileDepartament.programmers && (this.mobileDepartament.programmers.filter(programmer => programmer.currentProject === null)).length >= project.difficulty) {
+        for (let d = 0; d < project.difficulty; d += 1) {
+          this.mobileDepartament.takeProject(project);
+          this.director.transferProject();
+        }
+      }
+    }
+  }
+
+  transferProjectForTest(typeOfProject) {
+    if (typeOfProject === 'web') {
+      this.webDepartament.programmers.forEach((programmer) => {
+        if (programmer.currentProject !== null) {
+          if (programmer.currentProject.status === 'ready for test') {
+            this.testDepartament.takeProjectOnTest(programmer.currentProject);
+            programmer.removeProject();
+          }
+        }
+      });
+    } else {
+      this.mobileDepartament.programmers.forEach((programmer) => {
+        if (programmer.currentProject !== null) {
+          if (programmer.currentProject.status === 'ready for test') {
+            this.testDepartament.takeProjectOnTest(programmer.currentProject);
+            programmer.removeProject();
+          }
+        }
+      });
+    }
+  }
 }
+
 function workCompany(days) { // ноль проектов, ноль программистов
   const lds = new Firm('Lodoss');
   lds.hireDirector('Denis', 35);
@@ -217,46 +296,14 @@ function workCompany(days) { // ноль проектов, ноль програ
   lds.openDepartament('test');
   for (let j = 1; j < (days + 1); j += 1) {
     lds.director.addProgrammer();
-    for (let i = 0; i < (lds.director.numberOfProgrammers + 1); i += 1) {
-      const programmer = lds.director.programmers.shift();
-      if (programmer instanceof WebProgrammer) {
-        lds.webDepartament.addProgrammer(programmer);
-      } else if (programmer instanceof MobileProgrammer) {
-        lds.mobileDepartament.addProgrammer(programmer);
-      }
-    }
+    lds.directorTransferProgrammers();
     lds.director.addProject();
-    for (let i = 0; i < lds.director.numberOfProjects; i += 1) {
-      const project = lds.director.projects[i];
-      if (project instanceof WebProject && lds.webDepartament.programmers) {
-        lds.webDepartament.takeProject(project);
-        lds.director.transferProject();
-      } else if (project instanceof MobileProject && lds.mobileDepartament.programmers && (lds.mobileDepartament.programmers.filter(programmer => programmer.currentProject === null)).length >= project.difficulty) {
-        for (let d = 0; d < project.difficulty; d += 1) {
-          lds.mobileDepartament.takeProject(project);
-          lds.director.transferProject();
-        }
-      }
-    }
+    lds.directorTransferProjects();
     lds.director.deleteProjects();
     lds.webDepartament.workDay();
-    lds.webDepartament.programmers.forEach((programmer) => {
-      if (programmer.currentProject !== null) {
-        if (programmer.currentProject.status === 'ready for test') {
-          lds.testDepartament.takeProjectOnTest(programmer.currentProject);
-          programmer.removeProject();
-        }
-      }
-    });
+    lds.transferProjectForTest('web');
     lds.mobileDepartament.workDay();
-    lds.mobileDepartament.programmers.forEach((programmer) => {
-      if (programmer.currentProject !== null) {
-        if (programmer.currentProject.status === 'ready for test') {
-          lds.testDepartament.takeProjectOnTest(programmer.currentProject);
-          programmer.removeProject();
-        }
-      }
-    });
+    lds.transferProjectForTest('mobile');
     lds.testDepartament.testProject();
     lds.webDepartament.dismissWorker();
     lds.mobileDepartament.dismissWorker();
@@ -265,4 +312,4 @@ function workCompany(days) { // ноль проектов, ноль програ
   console.log(`Количество выполненных проектов: ${lds.testDepartament.implementProject}`);
   console.log(`Количество уволенных сотрудсников: ${lds.webDepartament.dismissedWorkers + lds.mobileDepartament.dismissedWorkers}`);
 }
-workCompany(5);
+workCompany(100);
