@@ -1,3 +1,4 @@
+// const j = Math.floor(Math.random() * 2) + 1;
 class Project {
   constructor(difficulty) {
     this.difficulty = difficulty;
@@ -9,24 +10,33 @@ class Project {
   }
 }
 // создать фабрику для проектов и программистов
+class ProjectFactory {
+  static createProject() {}
+}
+
 class WebProject extends Project {
 }
 class MobileProject extends Project {
 }
-function randomProjects(arr) {
-  const n = Math.floor(Math.random() * 3) + 0;
-  for (let i = 0; i < n; i += 1) {
-    const arrOfDifficulty = [1, 2, 3];
-    const arrOfSpecialty = ['web', 'mobile'];
-    const k = Math.floor(Math.random() * 3) + 0;
-    const j = Math.floor(Math.random() * 2) + 0;
-    if (arrOfSpecialty[j] === 'web') {
-      arr.push(new WebProject(arrOfDifficulty[k]));
-    } else if (arrOfSpecialty[j] === 'mobile') {
-      arr.push(new MobileProject(arrOfDifficulty[k]));
-    }
+class CreateWebProject extends ProjectFactory {
+  createProject(d) {
+    return new WebProject(d);
   }
 }
+class CreateMobileProject extends ProjectFactory {
+  createProject(d) {
+    return new MobileProject(d);
+  }
+}
+function randomProjects(arr) {
+  const n = Math.floor(Math.random() * 4) + 1;
+  for (let i = 0; i < n; i += 1) {
+    const arrOfProjects = [new CreateWebProject(), new CreateMobileProject()];
+    const pr = Math.floor(Math.random() * 2) + 0;
+    const d = Math.floor(Math.random() * 3) + 1;
+    arr.push(arrOfProjects[pr].createProject(d));
+  }
+}// реализация паттерна фабричного метода для проектов, надеюсь правильно понял
 class Programmer {
   constructor() {
     this.experience = 0;
@@ -172,6 +182,19 @@ class Testers extends PartOfCompany {
     }
   }
 }
+class ProgrammersFactory {
+  static createProgrammer() {}
+}
+class CreateWebProgrammer extends ProgrammersFactory {
+  createProgrammer() {
+    return new WebProgrammer();
+  }
+}
+class CreateMobileProgrammer extends ProgrammersFactory {
+  createProgrammer() {
+    return new MobileProgrammer();
+  }
+}// реализация фабричного метода
 class Director {
   constructor(name, age) {
     this.name = name;
@@ -181,7 +204,7 @@ class Director {
     this.newStaff = 0;
     this.numberOfProgrammers = 0;
     this.numberOfProjects = 0;
-  } // сделать через синглтон
+  } 
 
   addProject() {
     const arr = this.projects;
@@ -192,12 +215,12 @@ class Director {
   addProgrammer() {
     this.projects.forEach((item) => {
       if (item instanceof WebProject) {
-        this.programmers.push(new WebProgrammer());
+        this.programmers.push(new CreateWebProgrammer().createProgrammer());
         this.newStaff += 1;
         this.numberOfProgrammers += 1;
       } else if (item instanceof MobileProject) {
         for (let i = 0; i < item.difficulty; i += 1) {
-          this.programmers.push(new MobileProgrammer());
+          this.programmers.push(new CreateMobileProgrammer().createProgrammer());
           this.newStaff += 1;
           this.numberOfProgrammers += 1;
         }
